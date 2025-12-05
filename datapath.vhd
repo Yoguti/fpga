@@ -272,8 +272,8 @@ end component;
 begin	
 
 ---------------------------FSM_clock--------------------------------------
-freq_de2: FSM_clock_de2 port map(R1, E2orE3, clk, CLK_1Hz, CLK_050Hz, CLK_033Hz, CLK_025Hz, CLK_020Hz); -- Para usar na placa DE2
---freq_emu: FSM_clock_emu port map(R1, E2orE3, clk, CLK_1Hz, CLK_050Hz, CLK_033Hz, CLK_025Hz, CLK_020Hz); -- Para usar no emulador
+--freq_de2: FSM_clock_de2 port map(R1, E2orE3, clk, CLK_1Hz, CLK_050Hz, CLK_033Hz, CLK_025Hz, CLK_020Hz); -- Para usar na placa DE2
+freq_emu: FSM_clock_emu port map(R1, E2orE3, clk, CLK_1Hz, CLK_050Hz, CLK_033Hz, CLK_025Hz, CLK_020Hz); -- Para usar no emulador
 
 -- o aluno deve interligar todas as componentes seguindo o modelo do datapath dado
 

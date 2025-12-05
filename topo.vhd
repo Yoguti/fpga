@@ -1,115 +1,112 @@
-library ieee;
-use ieee.std_logic_1164.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
-entity topo is
-port(
-		CLOCK_50: in std_logic;
-		CLK_500Hz: in std_logic;
-		KEY: in std_logic_vector(1 downto 0);
-		SW: in std_logic_vector(17 downto 0);
-		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7: out std_logic_vector(6 downto 0);
-		LEDR: out std_logic_vector(15 downto 0)
-);	
-end topo;
+ENTITY topo IS
+    PORT (
+        CLOCK_50 : IN STD_LOGIC;
+        CLK_500Hz : IN STD_LOGIC;
+        KEY : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+        SW : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+        HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        LEDR : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    );
+END topo;
 
-architecture circuito of topo is
-signal enter, reset: std_logic;
-signal R1, R2, E1, E2, E3, E4, E5: std_logic;
-signal end_game, end_time, end_round, end_FPGA: std_logic;		
-signal clock: std_logic;
+ARCHITECTURE circuito OF topo IS
+    SIGNAL enter, reset : STD_LOGIC;
+    SIGNAL R1, R2, E1, E2, E3, E4, E5 : STD_LOGIC;
+    SIGNAL end_game, end_time, end_round, end_FPGA : STD_LOGIC;
 
-component datapath is
-port(
-	-- Entradas de dados
-	clk: in std_logic;
-	SW: in std_logic_vector(17 downto 0);
-	
-	-- Entradas de controle
-	R1, R2, E1, E2, E3, E4, E5: in std_logic;
-	
-	-- Saídas de dados
-	hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7: out std_logic_vector(6 downto 0);
-	ledr: out std_logic_vector(15 downto 0);
-	
-	-- Saídas de status
-	end_game, end_time, end_round, end_FPGA: out std_logic
-);
-end component;
+    COMPONENT datapath IS
+        PORT (
+            -- Entradas de dados
+            clk : IN STD_LOGIC;
+            SW : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
 
-component controle is
-port(
--- Entradas de controle
-	enter, reset, CLOCK: in std_logic;
--- Entradas de status
-	end_game, end_time, end_round, end_FPGA: in std_logic;
--- Saídas de comandos
-	R1, R2, E1, E2, E3, E4, E5: out std_logic
-);
-end component;
+            -- Entradas de controle
+            R1, R2, E1, E2, E3, E4, E5 : IN STD_LOGIC;
 
-component ButtonSync is port( --saida ja negada
+            -- Saídas de dados
+            hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            ledr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 
-    KEY1, KEY0, CLK: in  std_logic;
-    BTN1, BTN0   : out std_logic);
+            -- Saídas de status
+            end_game, end_time, end_round, end_FPGA : OUT STD_LOGIC
+        );
+    END COMPONENT;
 
-end component;
+    COMPONENT controle IS
+        PORT (
+            -- Entradas de controle
+            enter, reset, CLOCK : IN STD_LOGIC;
+            -- Entradas de status
+            end_game, end_time, end_round, end_FPGA : IN STD_LOGIC;
+            -- Saídas de comandos
+            R1, R2, E1, E2, E3, E4, E5 : OUT STD_LOGIC
+        );
+    END COMPONENT;
 
-begin
+    COMPONENT ButtonSync IS PORT (--saida ja negada
 
+        KEY1, KEY0, CLK : IN STD_LOGIC;
+        BTN1, BTN0 : OUT STD_LOGIC);
+
+    END COMPONENT;
+
+BEGIN
     -- sincroniza botões (KEY1 -> enter, KEY0 -> reset)
     BS_inst : ButtonSync
-    port map(
+    PORT MAP(
         KEY1 => KEY(1),
         KEY0 => KEY(0),
-        CLK  => CLOCK_50,
+        CLK => CLOCK_50,
         BTN1 => enter,
         BTN0 => reset
     );
 
     -- datapath (associação por nome)
     DP_inst : datapath
-    port map(
-        clk      => CLOCK_50,
-        SW       => SW,
-        R1       => R1,
-        R2       => R2,
-        E1       => E1,
-        E2       => E2,
-        E3       => E3,
-        E4       => E4,
-        E5       => E5,
-        hex0     => HEX0,
-        hex1     => HEX1,
-        hex2     => HEX2,
-        hex3     => HEX3,
-        hex4     => HEX4,
-        hex5     => HEX5,
-        hex6     => HEX6,
-        hex7     => HEX7,
-        ledr     => LEDR,
+    PORT MAP(
+        clk => CLOCK_50,
+        SW => SW,
+        R1 => R1,
+        R2 => R2,
+        E1 => E1,
+        E2 => E2,
+        E3 => E3,
+        E4 => E4,
+        E5 => E5,
+        hex0 => HEX0,
+        hex1 => HEX1,
+        hex2 => HEX2,
+        hex3 => HEX3,
+        hex4 => HEX4,
+        hex5 => HEX5,
+        hex6 => HEX6,
+        hex7 => HEX7,
+        ledr => LEDR,
         end_game => end_game,
         end_time => end_time,
-        end_round=> end_round,
+        end_round => end_round,
         end_FPGA => end_FPGA
     );
 
     -- controlador (associação por nome para coincidir com a entity controle)
     CTRL_inst : controle
-    port map(
-        R1       => R1,
-        R2       => R2,
-        E1       => E1,
-        E2       => E2,
-        E3       => E3,
-        E4       => E4,
-        E5       => E5,
-        clock    => CLOCK_50,
-        enter    => enter,
-        reset    => reset,
+    PORT MAP(
+        R1 => R1,
+        R2 => R2,
+        E1 => E1,
+        E2 => E2,
+        E3 => E3,
+        E4 => E4,
+        E5 => E5,
+        clock => CLOCK_50,
+        enter => enter,
+        reset => reset,
         end_FPGA => end_FPGA,
         end_game => end_game,
         end_time => end_time,
-        end_round=> end_round
+        end_round => end_round
     );
-
-end circuito;
+END circuito;

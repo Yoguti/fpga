@@ -34,30 +34,19 @@ BEGIN
     -- Lógica de Próximo Estado e Saídas
     P2 : PROCESS (EA, enter, end_FPGA, end_time, end_round, end_game)
     BEGIN
+        -- Valores padrão
         PE <= EA;
-        R1 <= '0';
-        R2 <= '0';
-        E1 <= '0';
-        E2 <= '0';
-        E3 <= '0';
-        E4 <= '0';
-        E5 <= '0';
+        R1 <= '0'; R2 <= '0';
+        E1 <= '0'; E2 <= '0'; E3 <= '0'; E4 <= '0'; E5 <= '0';
 
         CASE EA IS
             WHEN Init =>
-                -- Descrição: Reseta o sistema.
-                -- Ação: Passa diretamente para Setup.
-                -- Sinais: Ativar Resets (exemplo: R1 e R2)
-                R1 <= '1';
-                R2 <= '1';
-
+                R1 <= '1'; -- Reseta Counter Time
+                R2 <= '1'; -- Reseta Jogo (Round, Bonus, User)
                 PE <= Setup;
 
             WHEN Setup =>
-                -- Descrição: Usuário escolhe Nível e Sequência nos Switches.
-                -- Saída: Aguarda usuário apertar Enter (BTN1).
-
-                -- Se apertar Enter, começa o jogo
+                E1 <= '1'; -- Habilita salvar SW de Seleção (Nivel/Seq)
                 IF enter = '1' THEN
                     PE <= Play_FPGA;
                 ELSE
@@ -65,12 +54,7 @@ BEGIN
                 END IF;
 
             WHEN Play_FPGA =>
-                -- Descrição: Mostra a sequência nos Displays.
-                -- Saída: Aguarda o tempo terminar (end_FPGA).
-
-                -- Ativar sinais necessários para exibir a ROM e contar tempo
-                -- Exemplo (hipotético): E2 <= '1'; 
-
+                E2 <= '1'; -- Habilita MUX para mostrar a SEQUENCIA (ROM)
                 IF end_FPGA = '1' THEN
                     PE <= Play_user;
                 ELSE
@@ -78,59 +62,40 @@ BEGIN
                 END IF;
 
             WHEN Play_user =>
-                -- Descrição: Usuário tenta reproduzir a sequência. Tem 10s.
-                -- Saída: Apaga displays, habilita switches do usuário.
-
-                -- Habilitar contagem de 10s e leitura dos switches
-                -- Exemplo: E3 <= '1'; 
-
+                E3 <= '1'; -- Habilita MUX do Tempo + Decrementa Timer + Lê Switches User
                 IF end_time = '1' THEN
-                    -- Se o tempo acabar, perdeu a vez -> Result
-                    PE <= Result;
+                    PE <= Result; -- Tempo acabou = Game Over ou perde vida
                 ELSIF enter = '1' THEN
-                    -- Se apertar Enter a tempo -> Count_round
-                    PE <= Count_round;
+                    PE <= Count_round; -- Jogador confirmou a entrada
                 ELSE
                     PE <= Play_user;
                 END IF;
 
             WHEN Count_round =>
-                -- Descrição: Incrementa a rodada.
-                -- Transição direta para Check.
-
-                E4 <= '1'; -- Exemplo: sinal que incrementa o Counter_round
-
+                -- Estado transitorio para incrementar rodada e calcular bonus
+                E4 <= '1'; -- Incrementa Round e Atualiza Bonus
                 PE <= Check;
 
             WHEN Check =>
-                -- Descrição: Verifica se acabou o jogo ou se desconta pontos.
-                -- O Datapath já calcula os erros e atualiza bonus.
-
-                -- Verifica condições de parada
+                -- verifica status (logica combinacional resolve end_game/end_round)
                 IF (end_round = '1') OR (end_game = '1') THEN
                     PE <= Result;
                 ELSE
-                    PE <= SWait; -- Vai para espera entre rodadas
+                    PE <= SWait;
                 END IF;
 
             WHEN SWait =>
-                -- Espera usuário apertar Enter para próxima rodada.
-
+                -- Espera entre rodadas (mantém display parado ou apagado)
                 IF enter = '1' THEN
-                    PE <= Play_FPGA; -- Volta para mostrar nova sequência
+                    PE <= Play_FPGA; -- Vai para próxima rodada
                 ELSE
                     PE <= SWait;
                 END IF;
 
             WHEN Result =>
-                -- Mostra o resultado final.
-                -- Fica até usuário reiniciar para jogar de novo.
-
-                -- Ativar mux para mostrar pontos nos HEX
-                -- Exemplo: E5 <= '1';
-
+                E5 <= '1'; -- Habilita MUX para mostrar RESULTADO (Pontos)
                 IF enter = '1' THEN
-                    PE <= Init; -- Reinicia o jogo
+                    PE <= Init; -- Reinicia tudo
                 ELSE
                     PE <= Result;
                 END IF;

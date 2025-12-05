@@ -59,7 +59,7 @@ BEGIN
     PORT MAP(
         KEY1 => KEY(1),
         KEY0 => KEY(0),
-        CLK => CLOCK_50,
+        CLK => CLK_500Hz,
         BTN1 => enter,
         BTN0 => reset
     );
@@ -67,7 +67,7 @@ BEGIN
     -- datapath (associação por nome)
     DP_inst : datapath
     PORT MAP(
-        clk => CLOCK_50,
+        clk => CLK_500Hz,
         SW => SW,
         R1 => R1,
         R2 => R2,
@@ -101,7 +101,7 @@ BEGIN
         E3 => E3,
         E4 => E4,
         E5 => E5,
-        clock => CLOCK_50,
+        clock => CLK_500Hz,  -- usar clock lento da FSM
         enter => enter,
         reset => reset,
         end_FPGA => end_FPGA,

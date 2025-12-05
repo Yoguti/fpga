@@ -300,7 +300,6 @@ BEGIN
 	-- Apagado (1111111)
 	apagado <= "1111111";
 
-    -- (Remove outras atribuições duplicadas envolvendo E1.)
     sdec7_f <= apagado WHEN E2 = '0' ELSE sdec7;
     sdec6_f <= apagado WHEN E2 = '0' ELSE sdec6;
     sdec5_f <= apagado WHEN E2 = '0' ELSE sdec5;
@@ -309,13 +308,6 @@ BEGIN
     sdec2_f <= apagado WHEN E2 = '0' ELSE sdec2;
     sdec1_f <= apagado WHEN E2 = '0' ELSE sdec1;
     sdec0_f <= apagado WHEN E2 = '0' ELSE sdec0;
-
-    -- LÓGICA DE LIMPEZA (CLEANUP):
-    -- Quando em Setup (E1 = '1') forçamos os displays superiores a ficarem apagados.
-    sdec7_f <= apagado WHEN E1 = '1' ELSE sdec7;
-    sdec6_f <= apagado WHEN E1 = '1' ELSE sdec6;
-    sdec5_f <= apagado WHEN E1 = '1' ELSE sdec5;
-    sdec4_f <= apagado WHEN E1 = '1' ELSE sdec4;
 
 	-------------------------------CLOCK E TEMPO-------------------------------
 	-- Mux do Clock (Seleciona frequência baseado no nível)

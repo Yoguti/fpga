@@ -85,6 +85,7 @@ BEGIN
                 END IF;
 
             WHEN SWait =>
+                R1 <= '1';
                 -- Espera entre rodadas (mantém display parado ou apagado)
                 IF enter = '1' THEN
                     PE <= Play_FPGA; -- Vai para próxima rodada
@@ -104,5 +105,4 @@ BEGIN
                 PE <= Init;
         END CASE;
     END PROCESS;
-
 END bhv;
